@@ -3,7 +3,7 @@ import os
 
 
 def main(page: Page):
-    page.title = "Planeja Plant."
+    global arquivos_imagens_frutas
 
     def window_event(e):
         if e.data == "close":
@@ -14,6 +14,7 @@ def main(page: Page):
     def page_resize(e):
         page.update()
 
+    page.title = "Planeja Plant."
     page.on_resize = page_resize
     page.window_prevent_close = True
     page.window_maximized = True
@@ -53,6 +54,49 @@ def main(page: Page):
     def nao_click(e):
         confirmacao_saida.open = False
         page.update()
+
+    try:
+        arquivos_imagens_frutas = r"assets/FRUTAS"
+    except NotADirectoryError:
+        try:
+            arquivos_imagens_frutas = r"assets\FRUTAS"
+        except NotADirectoryError:
+            AlertDialog(
+                modal=True,
+                title=Text(
+                    value="PASTA DE ARQUIVOS NÃO ENCONTRADA?",
+                    weight=FontWeight.BOLD,
+                    color=colors.RED,
+                    italic=True,
+                    text_align=TextAlign.CENTER,
+                ),
+                content=Text(
+                    value="O DIRETORIO CONTENDO AS IMAGENS DAS FRUTAS NÃO FOI ENCONTRADO!",
+                    weight=FontWeight.BOLD,
+                    color=colors.BLACK,
+                ),
+                actions=[
+                    ElevatedButton(
+                        text="FECHAR",
+                        on_click=lambda _: page.window_destroy(),
+                        icon=icons.CHECK,
+                        icon_color=colors.GREEN,
+                        bgcolor=colors.GREEN_50,
+                        style=ButtonStyle(
+                            side={
+                                MaterialState.DEFAULT: BorderSide(1, colors.GREEN),
+                                MaterialState.HOVERED: BorderSide(2, colors.BLACK),
+                            },
+                            shape={
+                                MaterialState.DEFAULT: RoundedRectangleBorder(radius=2),
+                                MaterialState.HOVERED: RoundedRectangleBorder(radius=20),
+                            },
+                        ),
+                    ),
+                ],
+                actions_alignment=MainAxisAlignment.END,
+                alignment=alignment.center,
+            )
 
     confirmacao_saida = AlertDialog(
         modal=True,
@@ -123,7 +167,7 @@ def main(page: Page):
                         color=colors.WHITE,
                         bgcolor=colors.BLACK,
                     ),
-                    image_src=f"FRUTAS/{fruta}",
+                    image_src=f"assets/FRUTAS/{fruta}" if arquivos_imagens_frutas else f"assets\FRUTAS\{fruta}",
                     image_fit=ImageFit.FILL,
                     bgcolor=colors.BLUE_200,
                     border_radius=5,
@@ -140,7 +184,7 @@ def main(page: Page):
                         color=colors.WHITE,
                         bgcolor=colors.BLACK,
                     ),
-                    image_src=f"FRUTAS/{fruta}",
+                    image_src=f"assets/FRUTAS/{fruta}" if arquivos_imagens_frutas else f"assets\FRUTAS\{fruta}",
                     image_fit=ImageFit.FILL,
                     bgcolor=colors.BLUE_200,
                     border_radius=5,
@@ -149,7 +193,7 @@ def main(page: Page):
                     height=100,
                     opacity=0.8,
                 ),
-            ) for fruta in sorted(os.listdir("FRUTAS"))
+            ) for fruta in sorted(os.listdir(arquivos_imagens_frutas))
         ]
     )
     area_plantio = GridView(
@@ -235,6 +279,11 @@ def main(page: Page):
                         alignment=MainAxisAlignment.CENTER,
                         vertical_alignment=CrossAxisAlignment.CENTER,
                     ),
+                    # Row(
+                    #     controls=[
+                    #         Text(nome) for nome in os.listdir(arquivos_imagens_frutas)
+                    #     ]
+                    # )
                 ],
             )
         )
